@@ -45,12 +45,13 @@ class Point:
 
 class Ship:
 
-    def __init__(self, name, team, position):
+    def __init__(self, name, team, health):
         self.name = name
         self.team = team
-        self.position = position
         self.sunk = False
-        self.health = len(position)
+        self.length = health
+        self.health = health
+        self.position = []
         self.all_points = []
         abc = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
         numbers = [str(x) for x in range(0, 10)]
@@ -60,15 +61,11 @@ class Ship:
         self.all_points_dict = {point:Point(point[0], point[-1]) for point in self.all_points}
         self.all_positions = []
         for letter in abc:
-            for x in range(0, 11 - len(self.position)):
-                self.all_positions.append(self.all_points_dict[(letter + str(x))].slicer(self.all_points_dict[(letter + str(x + len(self.position) - 1))]))
+            for x in range(0, 11 - self.length):
+                self.all_positions.append(self.all_points_dict[(letter + str(x))].slicer(self.all_points_dict[(letter + str(x + self.length - 1))]))
         for number in numbers:
-            for x in range(0, 11 - len(self.position)):
-                print(self.all_points_dict[abc[x] + number].slicer(self.all_points_dict[(abc[x + len(self.position) - 1] + number)]))
-                self.all_positions.append(self.all_points_dict[abc[x] + number].slicer(self.all_points_dict[(abc[x + len(self.position) - 1] + number)]))
-
-
-        print(self.all_positions)
+            for x in range(0, 11 - self.length):
+                self.all_positions.append(self.all_points_dict[abc[x] + number].slicer(self.all_points_dict[(abc[x + self.length - 1] + number)]))
                 
 
     
@@ -96,6 +93,7 @@ class Grid:
         self.name = name
 
     #Defining the Points:
+        numbers = [str(x) for x in range(0, 10)]
         abc = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
         row0 = [x + "0" for x in abc]
         row1 = [x + "1" for x in abc]
@@ -117,12 +115,51 @@ class Grid:
 
         self.points_dict = {point:Point(point[0], point[-1]) for point in self.points_list}
 
+        self.all_positions_on_grid = []
+        for letter in abc:
+            for possible_length in range(2,6):
+                for x in range(0, 11 - possible_length):
+                    self.all_positions_on_grid.append(self.points_dict[(letter + str(x))].slicer(self.points_dict[(letter + str(x + possible_length - 1))]))
+        for number in numbers:
+            for possible_length in range(2,6):
+                for x in range(0, 11 - possible_length):
+                    self.all_positions_on_grid.append(self.points_dict[abc[x] + number].slicer(self.points_dict[(abc[x + possible_length - 1] + number)]))
+        
+        for position in self.all_positions_on_grid:
+            while self.all_positions_on_grid.count(position) > 1:
+                self.all_positions_on_grid.remove(position)
+
     
     def place_ship(self, ship):
 
-        for pt in ship.position:
-            self.points_dict[pt].make_ship(ship.name[0])
+        available_ship_positions = []
+        for position in ship.all_positions:
+            if position in self.all_positions_on_grid:
+                available_ship_positions.append(position)
+
+
+        ship.position = random.choice(available_ship_positions)
         
+        taken_points = []
+        bad_positions = []
+
+        for point in ship.position:
+            self.points_dict[point].make_ship(ship.name[0])
+            taken_points.append(point)
+
+        for point in taken_points:
+            for position in self.all_positions_on_grid:
+                if point in position:
+                    bad_positions.append(position)
+
+        for position in self.all_positions_on_grid:
+            if position in bad_positions:
+                self.all_positions_on_grid.remove(position)
+
+
+
+            #Why does this not eliminate every position in self.all_positions_on_grid that contains any point from ship.position
+
         
 
 
@@ -160,11 +197,17 @@ class Grid:
 grid1 = Grid("Your Grid:")
 grid2 = Grid("Enemy Grid:")
 
-grid1.place_ship(Ship("Destroyer", "Player", input("Please enter the coordinates where you would like your destroyer: ").split()))
+grid1.place_ship(Ship("Destroyer", "Player", 3))
+grid1.place_ship(Ship("Carrier", "Player", 5))
+grid1.place_ship(Ship("Submarine", "Player", 3))
+grid1.place_ship(Ship("Patrol Boat", "Player", 2))
+grid1.place_ship(Ship("Battleship", "Player", 4))
 
-for x in range(0,3):
+grid1.print_grid()
+
+'''for x in range(0,3):
     grid2.print_grid()
     grid2.fire(input("Where would you like to fire? "))
     grid1.print_grid()
-    grid1.fire(random.choice(grid1.points_list))
+    grid1.fire(random.choice(grid1.points_list))'''
     
