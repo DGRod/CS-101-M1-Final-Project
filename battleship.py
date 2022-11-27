@@ -151,12 +151,19 @@ class Grid:
             for position in self.all_positions_on_grid:
                 if point in position:
                     bad_positions.append(position)
+        
+        for position in bad_positions:
+            if bad_positions.count(position) > 1:
+                while bad_positions.count(position) > 1:
+                    bad_positions.remove(position)
+
+        print(bad_positions)
 
         for position in self.all_positions_on_grid:
             if position in bad_positions:
                 self.all_positions_on_grid.remove(position)
-
-
+        print("self.all_positions_on_grid")
+        print(self.all_positions_on_grid)
 
             #Why does this not eliminate every position in self.all_positions_on_grid that contains any point from ship.position
 
