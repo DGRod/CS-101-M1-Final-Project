@@ -138,8 +138,11 @@ class Grid:
                 available_ship_positions.append(position)
 
 
+
         ship.position = random.choice(available_ship_positions)
         
+
+
         taken_points = []
         bad_positions = []
 
@@ -157,17 +160,9 @@ class Grid:
                 while bad_positions.count(position) > 1:
                     bad_positions.remove(position)
 
-        print(bad_positions)
-
-        for position in self.all_positions_on_grid:
-            if position in bad_positions:
+        for position in bad_positions:
+            if position in self.all_positions_on_grid:
                 self.all_positions_on_grid.remove(position)
-        print("self.all_positions_on_grid")
-        print(self.all_positions_on_grid)
-
-            #Why does this not eliminate every position in self.all_positions_on_grid that contains any point from ship.position
-
-        
 
 
     def print_grid(self):
