@@ -10,7 +10,9 @@ class Point:
         self.position = self.xcoord + self.ycoord
         self.value = "-"
         self.is_ship = False
+        self.probability = 0.0
         
+    
     
     def __repr__(self):
         return self.position
@@ -152,6 +154,8 @@ class Grid:
             while self.all_positions_on_grid.count(position) > 1:
                 self.all_positions_on_grid.remove(position)
 
+        
+
     
     def place_ship(self, ship):
 
@@ -192,6 +196,7 @@ class Grid:
 
         self.all_ships.append(ship)
         self.total_health += ship.health
+        
 
 
     def print_grid(self):
@@ -234,9 +239,70 @@ class Player:
         self.previous_target = "A0"
         self.hit_point = "  "
         self.hit_list = []
+        self.most_probable_points = []
+        self.counter = 1
 
+        numbers = [str(x) for x in range(0, 10)]
+        abc = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
+        
+        self.all_enemy_positions = []
+        for letter in abc:
+            for possible_length in range(2,6):
+                for x in range(0, 11 - possible_length):
+                    self.all_enemy_positions.append(self.enemy_grid.points_dict[(letter + str(x))].slicer(self.enemy_grid.points_dict[(letter + str(x + possible_length - 1))]))
+        for number in numbers:
+            for possible_length in range(2,6):
+                for x in range(0, 11 - possible_length):
+                    self.all_enemy_positions.append(self.enemy_grid.points_dict[abc[x] + number].slicer(self.enemy_grid.points_dict[(abc[x + possible_length - 1] + number)]))
+        
+        for position in self.all_enemy_positions:
+            while self.all_enemy_positions.count(position) > 1:
+                self.all_enemy_positions.remove(position)
+
+        
 
     def ai(self, difficulty=1):
+
+
+
+
+        if difficulty == 3:
+            
+            for point in self.target_points:
+                for position in self.all_enemy_positions:
+                    pass
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         if difficulty == 2:
             target = random.choice(self.target_points)
@@ -287,14 +353,14 @@ class Player:
                     if clean_likely_points.count(point) > 1:
                         while clean_likely_points.count(point) > 1:
                             clean_likely_points.remove(point)
-                print("Clean likely points: ", clean_likely_points)
+                print("Likely points: ", clean_likely_points)
                 
                 hit_neighbors = self.enemy_grid.points_dict[self.hit_point].neighbors()
                 clean_hit_neighbors = []
                 for point in hit_neighbors:
                     if point in self.target_points:
                         clean_hit_neighbors.append(point)
-                print("clean hit neighbors", clean_hit_neighbors)
+                print("Hit neighbors", clean_hit_neighbors)
 
                 if len(clean_likely_points) > 0:
                     target = random.choice(clean_likely_points)
@@ -335,7 +401,10 @@ class Player:
 
 
     def fire(self, target):
+        time.sleep(3)
+        print("Turn #" + str(self.counter))
         print("Firing at " + target)
+        self.counter += 1
         self.target_points.remove(target)
         self.previous_target = target
         if self.enemy_grid.points_dict[target].is_ship == True:
@@ -349,7 +418,7 @@ class Player:
                     self.enemy_grid.total_health += -1
                     if ship.health == 0:
                         ship.sink()
-
+            
             self.enemy_grid.print_grid()
         else:
             print("Miss!")
@@ -407,7 +476,7 @@ grid2.reveal_ships()
     grid1.print_grid()
     Player2.fire(random.choice(grid1.points_list))'''
     
-for x in range (0, 20):
-    Player1.fire(Player1.ai(2))
+'''while grid2.total_health > 0:
+    Player1.fire(Player1.ai(2))'''
 
 
