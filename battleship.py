@@ -265,13 +265,21 @@ class Player:
 
 
 
-
         if difficulty == 3:
+
+            available_enemy_positions = []
+            for position in self.all_enemy_positions:
+                point_list = []
+                for point in position:
+                    if point in self.target_points:
+                        point_list.append(point)
+                if point_list == position:
+                    available_enemy_positions.append(position)
+
             
-            for point in self.target_points:
-                for position in self.all_enemy_positions:
-                    pass
-                
+            
+
+
 
 
 
@@ -476,7 +484,7 @@ grid2.reveal_ships()
     grid1.print_grid()
     Player2.fire(random.choice(grid1.points_list))'''
     
-'''while grid2.total_health > 0:
-    Player1.fire(Player1.ai(2))'''
+while grid2.total_health > 0:
+    Player1.fire(Player1.ai(3))
 
 
