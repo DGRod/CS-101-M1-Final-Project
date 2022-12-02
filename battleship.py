@@ -10,7 +10,7 @@ class Point:
         self.position = self.xcoord + self.ycoord
         self.value = "-"
         self.is_ship = False
-        self.probability = 0.0
+        self.probability = 0
         
     
     
@@ -259,6 +259,72 @@ class Player:
             while self.all_enemy_positions.count(position) > 1:
                 self.all_enemy_positions.remove(position)
 
+
+
+    def search(self, target):
+        target = self.enemy_grid.points_dict[target]
+        numbers = [str(x) for x in range(0, 10)]
+        abc = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
+        vert_borders = []
+        for point in self.enemy_grid.points_list:
+            if point[0] == "A":
+                vert_borders.append(point)
+            if point[0] == "J":
+                vert_borders.append(point)
+        horz_borders = []
+        for point in self.enemy_grid.points_list:
+            if point[1] == "0":
+                horz_borders.append(point)
+            if point[1] == "9":
+                horz_borders.append(point)
+        
+        vert_border_points = [self.enemy_grid.points_dict[item] for item in vert_borders]
+        horz_border_points = [self.enemy_grid.points_dict[item] for item in horz_borders]
+
+        left = target
+        right = target
+        up = target
+        down = target
+
+        if target.xcoord != "A":
+            var = 1
+            left = self.enemy_grid.points_dict[abc[abc.index(target.xcoord) - var] + target.ycoord]
+            while left.value != "X" and left.value != "O" and left not in vert_border_points:
+                var += 1
+                left = self.enemy_grid.points_dict[abc[abc.index(target.xcoord) - var] + target.ycoord]
+            if left.value == "X" or left.value == "O":
+                left = self.enemy_grid.points_dict[abc[abc.index(target.xcoord) - var + 1] + target.ycoord]
+        
+        if target.xcoord != "J":
+            var = 1
+            right = self.enemy_grid.points_dict[abc[abc.index(target.xcoord) + var] + target.ycoord]
+            while right.value != "X" and right.value != "O" and right not in vert_border_points:
+                var += 1
+                right = self.enemy_grid.points_dict[abc[abc.index(target.xcoord) + var] + target.ycoord]
+            if right.value == "X" or right.value == "O":
+                right = self.enemy_grid.points_dict[abc[abc.index(target.xcoord) + var - 1] + target.ycoord]
+
+        if target.ycoord != "0":
+            var = 1
+            up = self.enemy_grid.points_dict[target.xcoord + numbers[numbers.index(target.ycoord) - var]]
+            while up.value != "X" and up.value != "O" and up not in horz_border_points:
+                var += 1
+                up = self.enemy_grid.points_dict[target.xcoord + numbers[numbers.index(target.ycoord) - var]]
+            if up.value == "X" or up.value == "O":
+                up = self.enemy_grid.points_dict[target.xcoord + numbers[numbers.index(target.ycoord) - var + 1]]
+        if target.ycoord != "9":
+            var = 1
+            down = self.enemy_grid.points_dict[target.xcoord + numbers[numbers.index(target.ycoord) + var]]
+            while down.value != "X" and down.value != "O" and down not in horz_border_points:
+                var += 1
+                down = self.enemy_grid.points_dict[target.xcoord + numbers[numbers.index(target.ycoord) + var]]
+            if down.value == "X" or down.value == "O":
+                down = self.enemy_grid.points_dict[target.xcoord + numbers[numbers.index(target.ycoord) + var - 1]]
+                
+        return [left, right, up, down]
+
+
+
         
 
     def ai(self, difficulty=1):
@@ -266,49 +332,76 @@ class Player:
 
 
         if difficulty == 3:
-
-            available_enemy_positions = []
-            for position in self.all_enemy_positions:
-                point_list = []
-                for point in position:
-                    if point in self.target_points:
-                        point_list.append(point)
-                if point_list == position:
-                    available_enemy_positions.append(position)
-
-            
+            target = random.choice(self.target_points)
+            probable_points = []
+            self.probable_target_points = []
             
 
+            for point in self.target_points:
+                left = self.search(point)[0]
+                right = self.search(point)[1]
+                up = self.search(point)[2]
+                down = self.search(point)[3]
+
+                horz_slice = left.slicer(right)
+                vert_slice = up.slicer(down)
 
 
+            
+                point_probability = 0
+
+                if len(horz_slice) >= 5:
+                    point_probability += 1
+                if len(horz_slice) >= 4:
+                    point_probability += 1
+                if len(horz_slice) >= 3:
+                    point_probability += 2
+                if len(horz_slice) >= 2:
+                    point_probability += 1
+
+                if len(vert_slice) >= 5:
+                    point_probability += 1
+                if len(vert_slice) >= 4:
+                    point_probability += 1
+                if len(vert_slice) >= 3:
+                    point_probability += 2
+                if len(vert_slice) >= 2:
+                    point_probability += 1
+
+                self.enemy_grid.points_dict[point].probability = point_probability
+
+            proto_dict = {}
+            for (key, value) in self.enemy_grid.points_dict.items():
+                if key in self.target_points:
+                    proto_dict[key] = value
+            
+            prob_dict = {point.position:point.probability for point in proto_dict.values()}
+            
+            max_prob = max(prob_dict.values())
+            print("max prob: " + str(max_prob))
+
+            for point in prob_dict.keys():
+                print(point, prob_dict[point])
+                if prob_dict[point] == max_prob:
+                    probable_points.append(point)
+
+            
+            for point in probable_points:
+                
+                if point in self.target_points:
+                    self.probable_target_points.append(point)
+            print(self.probable_target_points)
+
+            
 
 
+            print("Length of probable target points: " + str(len(self.probable_target_points)))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            if len(self.probable_target_points) > 0:
+                target = random.choice(self.probable_target_points)
+                print(target)
+                return target
+            return target
 
 
 
@@ -409,7 +502,7 @@ class Player:
 
 
     def fire(self, target):
-        time.sleep(3)
+        time.sleep(0)
         print("Turn #" + str(self.counter))
         print("Firing at " + target)
         self.counter += 1
@@ -475,7 +568,7 @@ Player2 = Player("Enemy", "Computer", grid2, grid1)
 
 
 grid1.print_grid()
-grid2.reveal_ships()
+#grid2.reveal_ships()
 
 
 '''for x in range(0,10):
@@ -483,7 +576,9 @@ grid2.reveal_ships()
     Player1.fire(input("Where would you like to fire? "))
     grid1.print_grid()
     Player2.fire(random.choice(grid1.points_list))'''
-    
+
+
+
 while grid2.total_health > 0:
     Player1.fire(Player1.ai(3))
 
