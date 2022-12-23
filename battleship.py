@@ -236,7 +236,6 @@ class Player:
         self.enemy_grid = enemy_grid
         self.ships = self.grid.all_ships
         self.target_points = self.enemy_grid.points_list
-        self.previous_target = "A0"
         self.hit_point = "  "
         self.hit_list = []
         self.most_probable_points = []
@@ -330,169 +329,185 @@ class Player:
     def ai(self, difficulty=1):
 
 
-
-        if difficulty == 3:
-            target = random.choice(self.target_points)
-            probable_points = []
-            self.probable_target_points = []
+        #=================================================================================================================================
+        #4th choice: Probable Points 
+        #=================================================================================================================================
+        probable_points = []
+        probable_target_points = []
             
 
-            for point in self.target_points:
-                left = self.search(point)[0]
-                right = self.search(point)[1]
-                up = self.search(point)[2]
-                down = self.search(point)[3]
+        for point in self.target_points:
+            left = self.search(point)[0]
+            right = self.search(point)[1]
+            up = self.search(point)[2]
+            down = self.search(point)[3]
 
-                horz_slice = left.slicer(right)
-                vert_slice = up.slicer(down)
+            horz_slice = left.slicer(right)
+            vert_slice = up.slicer(down)
 
-
-            
-                point_probability = 0
-
-                if len(horz_slice) >= 5:
-                    point_probability += 1
-                if len(horz_slice) >= 4:
-                    point_probability += 1
-                if len(horz_slice) >= 3:
-                    point_probability += 2
-                if len(horz_slice) >= 2:
-                    point_probability += 1
-
-                if len(vert_slice) >= 5:
-                    point_probability += 1
-                if len(vert_slice) >= 4:
-                    point_probability += 1
-                if len(vert_slice) >= 3:
-                    point_probability += 2
-                if len(vert_slice) >= 2:
-                    point_probability += 1
-
-                self.enemy_grid.points_dict[point].probability = point_probability
-
-            proto_dict = {}
-            for (key, value) in self.enemy_grid.points_dict.items():
-                if key in self.target_points:
-                    proto_dict[key] = value
-            
-            prob_dict = {point.position:point.probability for point in proto_dict.values()}
-            
-            max_prob = max(prob_dict.values())
-            print("max prob: " + str(max_prob))
-
-            for point in prob_dict.keys():
-                print(point, prob_dict[point])
-                if prob_dict[point] == max_prob:
-                    probable_points.append(point)
 
             
-            for point in probable_points:
+            point_probability = 0
+
+            if len(horz_slice) >= 5:
+                point_probability += 1
+            if len(horz_slice) >= 4:
+                point_probability += 1
+            if len(horz_slice) >= 3:
+                point_probability += 2
+            if len(horz_slice) >= 2:
+                point_probability += 1
+
+            if len(vert_slice) >= 5:
+                point_probability += 1
+            if len(vert_slice) >= 4:
+                point_probability += 1
+            if len(vert_slice) >= 3:
+                point_probability += 2
+            if len(vert_slice) >= 2:
+                point_probability += 1
+
+            self.enemy_grid.points_dict[point].probability = point_probability
+
+        proto_dict = {}
+        for (key, value) in self.enemy_grid.points_dict.items():
+            if key in self.target_points:
+                proto_dict[key] = value
+            
+        prob_dict = {point.position:point.probability for point in proto_dict.values()}
+            
+        max_prob = max(prob_dict.values())
+        print("max prob: " + str(max_prob))
+
+        for point in prob_dict.keys():
+            #print(point, prob_dict[point])
+            if prob_dict[point] == max_prob:
+                probable_points.append(point)
+
+            
+        for point in probable_points:
                 
+            if point in self.target_points:
+                probable_target_points.append(point)
+        print(probable_target_points)
+        print("Length of probable target points: " + str(len(probable_target_points)))
+
+        #=================================================================================================================================
+        #3rd choice: Hit Neighbors
+        #=================================================================================================================================
+        clean_hit_neighbors = []
+
+        if self.hit_point != "  ":
+
+            hit_neighbors = self.enemy_grid.points_dict[self.hit_point].neighbors()
+            
+            for point in hit_neighbors:
                 if point in self.target_points:
-                    self.probable_target_points.append(point)
-            print(self.probable_target_points)
+                    clean_hit_neighbors.append(point)
+            print(clean_hit_neighbors)
 
-            
+        #=================================================================================================================================
+        #2nd choice: Likely Points
+        #=================================================================================================================================
+        likely_points = []
+        clean_likely_points = []
 
+        numbers = [str(x) for x in range(0, 10)]
+        abc = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 
-            print("Length of probable target points: " + str(len(self.probable_target_points)))
-
-            if len(self.probable_target_points) > 0:
-                target = random.choice(self.probable_target_points)
-                print(target)
-                return target
-            return target
-
-
-
-        if difficulty == 2:
-            target = random.choice(self.target_points)
-            likely_points = []
-
-            numbers = [str(x) for x in range(0, 10)]
-            abc = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
-
-            if self.hit_point != "  ":
-                if len(self.hit_list) >= 2:
-
-                    for point in self.hit_list:
-                        other_points = []
-                        for pt in self.hit_list:
-                            if pt != point:
-                                other_points.append(pt)
-                        for other_point in other_points:
-                            if other_point in self.enemy_grid.points_dict[point].neighbors():
-                                if point[0] == other_point[0]:
-                                    if point[1] < other_point[1]: 
-                                        if point[1] != "0":
-                                            likely_points.append(point[0] + str(int(point[1]) - 1))
-                                        if other_point[1] != "9":
-                                            likely_points.append(other_point[0] + str(int(other_point[1]) + 1))
-                                    if point[1] > other_point[1]:
-                                        if point[1] != "9":
-                                            likely_points.append(point[0] + str(int(point[1]) + 1))
-                                        if other_point[1] != "0":
-                                            likely_points.append(other_point[0] + str(int(other_point[1]) - 1))
-                                if point[1] == other_point[1]:
-                                    if abc.index(point[0]) < abc.index(other_point[0]):
-                                        if abc.index(point[0]) != 0:
-                                            likely_points.append(abc[abc.index(point[0]) - 1] + point[1])
-                                        if abc.index(other_point[0]) != 9:
-                                            likely_points.append(abc[abc.index(other_point[0]) + 1] + other_point[1])
-                                    if abc.index(point[0]) > abc.index(other_point[0]):
-                                        if abc.index(point[0]) != 9:
-                                            likely_points.append(abc[abc.index(point[0]) + 1] + point[1])
-                                        if abc.index(other_point[0]) != 0:
-                                            likely_points.append(abc[abc.index(other_point[0]) - 1] + other_point[1])
+        if self.hit_point != "  ":
+            if len(self.hit_list) >= 2:
+                for point in self.hit_list:
+                    other_points = []
+                    for pt in self.hit_list:
+                        if pt != point:
+                            other_points.append(pt)
+                    for other_point in other_points:
+                        if other_point in self.enemy_grid.points_dict[point].neighbors():
+                            if point[0] == other_point[0]:
+                                if point[1] < other_point[1]: 
+                                    if point[1] != "0":
+                                        likely_points.append(point[0] + str(int(point[1]) - 1))
+                                    if other_point[1] != "9":
+                                        likely_points.append(other_point[0] + str(int(other_point[1]) + 1))
+                                if point[1] > other_point[1]:
+                                    if point[1] != "9":
+                                        likely_points.append(point[0] + str(int(point[1]) + 1))
+                                    if other_point[1] != "0":
+                                        likely_points.append(other_point[0] + str(int(other_point[1]) - 1))
+                            if point[1] == other_point[1]:
+                                if abc.index(point[0]) < abc.index(other_point[0]):
+                                    if abc.index(point[0]) != 0:
+                                        likely_points.append(abc[abc.index(point[0]) - 1] + point[1])
+                                    if abc.index(other_point[0]) != 9:
+                                        likely_points.append(abc[abc.index(other_point[0]) + 1] + other_point[1])
+                                if abc.index(point[0]) > abc.index(other_point[0]):
+                                    if abc.index(point[0]) != 9:
+                                        likely_points.append(abc[abc.index(point[0]) + 1] + point[1])
+                                    if abc.index(other_point[0]) != 0:
+                                        likely_points.append(abc[abc.index(other_point[0]) - 1] + other_point[1])
 
 
-                clean_likely_points = []
-                for point in likely_points:
-                    if point in self.target_points:
-                        clean_likely_points.append(point)
-                for point in clean_likely_points:
-                    if clean_likely_points.count(point) > 1:
-                        while clean_likely_points.count(point) > 1:
-                            clean_likely_points.remove(point)
-                print("Likely points: ", clean_likely_points)
                 
-                hit_neighbors = self.enemy_grid.points_dict[self.hit_point].neighbors()
-                clean_hit_neighbors = []
-                for point in hit_neighbors:
-                    if point in self.target_points:
-                        clean_hit_neighbors.append(point)
-                print("Hit neighbors", clean_hit_neighbors)
+            for point in likely_points:
+                if point in self.target_points:
+                    clean_likely_points.append(point)
+            for point in clean_likely_points:
+                if clean_likely_points.count(point) > 1:
+                    while clean_likely_points.count(point) > 1:
+                        clean_likely_points.remove(point)
+            print("Likely points: ", clean_likely_points)
 
-                if len(clean_likely_points) > 0:
-                    target = random.choice(clean_likely_points)
+        #=================================================================================================================================
+        #1st choice: Probable and Likely Points
+        #=================================================================================================================================
+        probable_and_likely_points = []
 
-                elif len(clean_hit_neighbors) > 0:
-                    target = random.choice(clean_hit_neighbors)
+        for point in clean_likely_points:
+            if point in probable_target_points:
+                probable_and_likely_points.append(point)
+        
 
-                else:
-                    self.hit_point = "  "
+        if difficulty >= 3:
+
+            if len(probable_and_likely_points) > 0:
+                target = random.choice(probable_and_likely_points)
             
-            return target   
-
-
-
-        if difficulty == 1:
-            target = random.choice(self.target_points)
-
-            if self.hit_point != "  ":
-
-                hit_neighbors = self.enemy_grid.points_dict[self.hit_point].neighbors()
-                clean_hit_neighbors = []
-                for point in hit_neighbors:
-                    if point in self.target_points:
-                        clean_hit_neighbors.append(point)
-                print(clean_hit_neighbors)
-                if len(clean_hit_neighbors) > 0:
-                    target = random.choice(clean_hit_neighbors)
-                else:
-                    self.hit_point = "  "
+            elif len(clean_likely_points) > 0:
+                target = random.choice(clean_likely_points)
             
-            return target   
+            elif len(clean_hit_neighbors) > 0:
+                target = random.choice(clean_hit_neighbors)
+            
+            elif len(probable_target_points) > 0:
+                target = random.choice(probable_target_points)
+            
+            else:
+                target = random.choice(self.target_points)
+
+        
+        elif difficulty >= 2:
+
+            if len(clean_likely_points) > 0:
+                target = random.choice(clean_likely_points)
+            
+            elif len(clean_hit_neighbors) > 0:
+                target = random.choice(clean_hit_neighbors)
+              
+            else:
+                target = random.choice(self.target_points)
+        
+
+        elif difficulty >= 1:
+
+            if len(clean_hit_neighbors) > 0:
+                target = random.choice(clean_hit_neighbors)
+              
+            else:
+                target = random.choice(self.target_points)
+
+        return target
+
 
 
 
@@ -507,7 +522,6 @@ class Player:
         print("Firing at " + target)
         self.counter += 1
         self.target_points.remove(target)
-        self.previous_target = target
         if self.enemy_grid.points_dict[target].is_ship == True:
             print("Hit!")
             self.hit_point = target
