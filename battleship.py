@@ -200,6 +200,7 @@ class Grid:
 
 
     def print_grid(self):
+        time.sleep(3)
         print(self.name)
         print("  A B C D E F G H I J")
         for row in self.rows:
@@ -517,7 +518,6 @@ class Player:
 
 
     def fire(self, target):
-        time.sleep(0)
         print("Turn #" + str(self.counter))
         print("Firing at " + target)
         self.counter += 1
@@ -585,15 +585,15 @@ grid1.print_grid()
 #grid2.reveal_ships()
 
 
-'''for x in range(0,10):
+for x in range(0,10):
     grid2.print_grid()
     Player1.fire(input("Where would you like to fire? "))
     grid1.print_grid()
-    Player2.fire(random.choice(grid1.points_list))'''
+    Player2.fire(random.choice(grid1.points_list))
 
 
 
-while grid2.total_health > 0:
-    Player1.fire(Player1.ai(3))
+'''while grid2.total_health > 0:
+    Player1.fire(Player1.ai(3))'''
 
 
