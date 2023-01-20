@@ -200,7 +200,7 @@ class Grid:
 
 
     def print_grid(self):
-        time.sleep(3)
+        #time.sleep(3)
         print(self.name)
         print("  A B C D E F G H I J")
         for row in self.rows:
@@ -543,29 +543,23 @@ class Player:
     
             
         
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
+#Player Setup
 
 grid1 = Grid("Your Grid:")
-grid2 = Grid("Enemy Grid:")
+
+player_one_name = input("Please enter player name: ")
 
 grid1.place_ship(Ship("Destroyer", "Player", 3))
 grid1.place_ship(Ship("Carrier", "Player", 5))
 grid1.place_ship(Ship("Submarine", "Player", 3))
 grid1.place_ship(Ship("Patrol Boat", "Player", 2))
 grid1.place_ship(Ship("Battleship", "Player", 4))
+
+
+
+
+
+grid2 = Grid("Enemy Grid:")
 
 grid2.place_ship(Ship("Destroyer", "Enemy", 3))
 grid2.place_ship(Ship("Carrier", "Enemy", 5))
@@ -576,20 +570,24 @@ grid2.place_ship(Ship("Battleship", "Enemy", 4))
 
 
 
-Player1 = Player("Player", "Diego", grid1, grid2)
+Player1 = Player("Player", player_one_name, grid1, grid2)
 Player2 = Player("Enemy", "Computer", grid2, grid1)
 
 
 
 grid1.print_grid()
-#grid2.reveal_ships()
+
+input("Ready? ")
 
 
-for x in range(0,10):
+while grid2.total_health > 0 and grid1.total_health > 0:
     grid2.print_grid()
     Player1.fire(input("Where would you like to fire? "))
+    time.sleep(2)
     grid1.print_grid()
-    Player2.fire(random.choice(grid1.points_list))
+    time.sleep(2)
+    Player2.fire(Player2.ai(3))
+    time.sleep(2)
 
 
 
