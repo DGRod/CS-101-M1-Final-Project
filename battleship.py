@@ -260,6 +260,16 @@ class Player:
                 self.all_enemy_positions.remove(position)
 
 
+        self.firing_solution_z2 = []
+        for number in numbers:
+            if int(number) % 2 == 0:
+                for letter in ["A", "C", "E", "G", "I"]:
+                    self.firing_solution_z2.append(letter + str(number))
+            else:
+                for letter in ["B", "D", "F", "H", "J"]:
+                    self.firing_solution_z2.append(letter + str(number))
+
+
 
     def search(self, target):
         target = self.enemy_grid.points_dict[target]
@@ -328,6 +338,12 @@ class Player:
         
 
     def ai(self, difficulty=1):
+
+        firing_solution_z2_clean = []
+        for point in self.firing_solution_z2:     
+            if point in self.target_points:
+                firing_solution_z2_clean.append(point)
+        
 
 
         #=================================================================================================================================
@@ -482,6 +498,9 @@ class Player:
             
             elif len(probable_target_points) > 0:
                 target = random.choice(probable_target_points)
+
+            elif len(firing_solution_z2_clean) > 0:
+                target = random.choice(self.firing_solution_z2)
             
             else:
                 target = random.choice(self.target_points)
