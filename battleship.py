@@ -409,6 +409,15 @@ class Player:
         print(probable_target_points)
         print("Length of probable target points: " + str(len(probable_target_points)))
 
+
+        probable_firing_solution_points = []
+        for point in probable_target_points:
+            if point in firing_solution_z2_clean:
+                probable_firing_solution_points.append(point)
+
+        print(probable_firing_solution_points)
+                
+
         #=================================================================================================================================
         #3rd choice: Hit Neighbors
         #=================================================================================================================================
@@ -421,7 +430,7 @@ class Player:
             for point in hit_neighbors:
                 if point in self.target_points:
                     clean_hit_neighbors.append(point)
-            print(clean_hit_neighbors)
+            print("Clean hit neighbors: " + str(clean_hit_neighbors))
 
         #=================================================================================================================================
         #2nd choice: Likely Points
@@ -495,12 +504,15 @@ class Player:
             
             elif len(clean_hit_neighbors) > 0:
                 target = random.choice(clean_hit_neighbors)
-            
+
+                '''elif len(probable_firing_solution_points) > 0:
+                target = random.choice(probable_firing_solution_points)'''
+
             elif len(probable_target_points) > 0:
                 target = random.choice(probable_target_points)
 
-            elif len(firing_solution_z2_clean) > 0:
-                target = random.choice(self.firing_solution_z2)
+                '''elif len(firing_solution_z2_clean) > 0:
+                target = random.choice(self.firing_solution_z2)'''
             
             else:
                 target = random.choice(self.target_points)
@@ -542,7 +554,7 @@ class Player:
         self.counter += 1
         self.target_points.remove(target)
         if self.enemy_grid.points_dict[target].is_ship == True:
-            print("Hit!")
+            print("////////////HIT!////////////")
             self.hit_point = target
             self.hit_list.append(target)
             self.enemy_grid.points_dict[target].hit()
@@ -596,21 +608,19 @@ Player2 = Player("Enemy", "Computer", grid2, grid1)
 
 grid1.print_grid()
 
-input("Ready? ")
+#input("Ready? ")
 
 
-while grid2.total_health > 0 and grid1.total_health > 0:
+'''while grid2.total_health > 0 and grid1.total_health > 0:
     grid2.print_grid()
     Player1.fire(input("Where would you like to fire? "))
     time.sleep(2)
     grid1.print_grid()
     time.sleep(2)
     Player2.fire(Player2.ai(3))
-    time.sleep(2)
+    time.sleep(2)'''
 
 
 
-'''while grid2.total_health > 0:
-    Player1.fire(Player1.ai(3))'''
-
-
+while grid2.total_health > 0:
+    Player1.fire(Player1.ai(3))
