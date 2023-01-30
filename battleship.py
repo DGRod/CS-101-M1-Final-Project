@@ -2,6 +2,7 @@ import random
 import time
 
 
+
 class Point:
 
     def __init__(self, xcoord, ycoord):
@@ -55,7 +56,7 @@ class Point:
 
 
     def hit(self):
-        self.value = "X"
+        self.value = '\033[1;31m' + "X" + '\033[0m'
     
     def miss(self):
         self.value = "O"
@@ -89,7 +90,6 @@ class Ship:
             for x in range(0, 11 - self.length):
                 self.all_positions.append(self.all_points_dict[abc[x] + number].slicer(self.all_points_dict[(abc[x + self.length - 1] + number)]))
                 
-
     
     def __repr__(self):
         return self.name + " has " + str(self.health) + " health."
@@ -157,16 +157,34 @@ class Grid:
         
 
     
-    def place_ship(self, ship):
+    def place_ship(self, ship, condition):
 
         available_ship_positions = []
         for position in ship.all_positions:
             if position in self.all_positions_on_grid:
                 available_ship_positions.append(position)
+        
 
+        if condition == "Manual":
+            player_choice = input("Where would you like to place your " + ship.name + "?\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place it.\n")
+            player_choice_a = player_choice[:2]
+            player_choice_b = player_choice[-2:]
+            point_a = self.points_dict[player_choice_a]
+            point_b = self.points_dict[player_choice_b]
+            player_chosen_position = point_a.slicer(point_b)
+            for position in available_ship_positions:
+                if player_chosen_position == position:
+                    ship.position = position
+        
+        if condition == "Random":
+            ship.position = random.choice(available_ship_positions)
+        
+        if type(condition) == list:
+            point_a = self.points_dict[condition[0]]
+            point_b = self.points_dict[condition[-1]]
+            preset_position = point_a.slicer(point_b)
+            ship.position = preset_position
 
-
-        ship.position = random.choice(available_ship_positions)
         
 
 
@@ -200,7 +218,6 @@ class Grid:
 
 
     def print_grid(self):
-        #time.sleep(3)
         print(self.name)
         print("  A B C D E F G H I J")
         for row in self.rows:
@@ -299,38 +316,39 @@ class Player:
         if target.xcoord != "A":
             var = 1
             left = self.enemy_grid.points_dict[abc[abc.index(target.xcoord) - var] + target.ycoord]
-            while left.value != "X" and left.value != "O" and left not in vert_border_points:
+            while left.value != '\033[1;31m' + "X" + '\033[0m' and left.value != "O" and left not in vert_border_points:
                 var += 1
                 left = self.enemy_grid.points_dict[abc[abc.index(target.xcoord) - var] + target.ycoord]
-            if left.value == "X" or left.value == "O":
+            if left.value == '\033[1;31m' + "X" + '\033[0m' or left.value == "O":
                 left = self.enemy_grid.points_dict[abc[abc.index(target.xcoord) - var + 1] + target.ycoord]
         
         if target.xcoord != "J":
             var = 1
             right = self.enemy_grid.points_dict[abc[abc.index(target.xcoord) + var] + target.ycoord]
-            while right.value != "X" and right.value != "O" and right not in vert_border_points:
+            while right.value != '\033[1;31m' + "X" + '\033[0m' and right.value != "O" and right not in vert_border_points:
                 var += 1
                 right = self.enemy_grid.points_dict[abc[abc.index(target.xcoord) + var] + target.ycoord]
-            if right.value == "X" or right.value == "O":
+            if right.value == '\033[1;31m' + "X" + '\033[0m' or right.value == "O":
                 right = self.enemy_grid.points_dict[abc[abc.index(target.xcoord) + var - 1] + target.ycoord]
 
         if target.ycoord != "0":
             var = 1
             up = self.enemy_grid.points_dict[target.xcoord + numbers[numbers.index(target.ycoord) - var]]
-            while up.value != "X" and up.value != "O" and up not in horz_border_points:
+            while up.value != '\033[1;31m' + '\033[1;31m' + "X" + '\033[0m' + '\033[0m' and up.value != "O" and up not in horz_border_points:
                 var += 1
                 up = self.enemy_grid.points_dict[target.xcoord + numbers[numbers.index(target.ycoord) - var]]
-            if up.value == "X" or up.value == "O":
+            if up.value == '\033[1;31m' + "X" + '\033[0m' or up.value == "O":
                 up = self.enemy_grid.points_dict[target.xcoord + numbers[numbers.index(target.ycoord) - var + 1]]
+                
         if target.ycoord != "9":
             var = 1
             down = self.enemy_grid.points_dict[target.xcoord + numbers[numbers.index(target.ycoord) + var]]
-            while down.value != "X" and down.value != "O" and down not in horz_border_points:
+            while down.value != '\033[1;31m' + "X" + '\033[0m' and down.value != "O" and down not in horz_border_points:
                 var += 1
                 down = self.enemy_grid.points_dict[target.xcoord + numbers[numbers.index(target.ycoord) + var]]
-            if down.value == "X" or down.value == "O":
+            if down.value == '\033[1;31m' + "X" + '\033[0m' or down.value == "O":
                 down = self.enemy_grid.points_dict[target.xcoord + numbers[numbers.index(target.ycoord) + var - 1]]
-                
+        
         return [left, right, up, down]
 
 
@@ -343,6 +361,8 @@ class Player:
         for point in self.firing_solution_z2:     
             if point in self.target_points:
                 firing_solution_z2_clean.append(point)
+
+        #print("Firing solution: ", firing_solution_z2_clean)
         
 
 
@@ -394,7 +414,7 @@ class Player:
         prob_dict = {point.position:point.probability for point in proto_dict.values()}
             
         max_prob = max(prob_dict.values())
-        print("max prob: " + str(max_prob))
+        #print("max prob: " + str(max_prob))
 
         for point in prob_dict.keys():
             #print(point, prob_dict[point])
@@ -406,8 +426,8 @@ class Player:
                 
             if point in self.target_points:
                 probable_target_points.append(point)
-        print(probable_target_points)
-        print("Length of probable target points: " + str(len(probable_target_points)))
+        #print(probable_target_points)
+        #print("Length of probable target points: " + str(len(probable_target_points)))
 
 
         probable_firing_solution_points = []
@@ -415,7 +435,7 @@ class Player:
             if point in firing_solution_z2_clean:
                 probable_firing_solution_points.append(point)
 
-        print(probable_firing_solution_points)
+        #print(probable_firing_solution_points)
                 
 
         #=================================================================================================================================
@@ -430,7 +450,7 @@ class Player:
             for point in hit_neighbors:
                 if point in self.target_points:
                     clean_hit_neighbors.append(point)
-            print("Clean hit neighbors: " + str(clean_hit_neighbors))
+            #print("Clean hit neighbors: " + str(clean_hit_neighbors))
 
         #=================================================================================================================================
         #2nd choice: Likely Points
@@ -482,7 +502,7 @@ class Player:
                 if clean_likely_points.count(point) > 1:
                     while clean_likely_points.count(point) > 1:
                         clean_likely_points.remove(point)
-            print("Likely points: ", clean_likely_points)
+            #print("Likely points: ", clean_likely_points)
 
         #=================================================================================================================================
         #1st choice: Probable and Likely Points
@@ -505,14 +525,14 @@ class Player:
             elif len(clean_hit_neighbors) > 0:
                 target = random.choice(clean_hit_neighbors)
 
-                '''elif len(probable_firing_solution_points) > 0:
-                target = random.choice(probable_firing_solution_points)'''
+            elif len(probable_firing_solution_points) > 0:
+                target = random.choice(probable_firing_solution_points)
 
             elif len(probable_target_points) > 0:
                 target = random.choice(probable_target_points)
 
-                '''elif len(firing_solution_z2_clean) > 0:
-                target = random.choice(self.firing_solution_z2)'''
+            elif len(firing_solution_z2_clean) > 0:
+                target = random.choice(self.firing_solution_z2)
             
             else:
                 target = random.choice(self.target_points)
@@ -550,11 +570,16 @@ class Player:
 
     def fire(self, target):
         print("Turn #" + str(self.counter))
-        print("Firing at " + target)
+
+        if self.name == player_one_name:
+            print("Firing at " + target)
+        else:
+            print("Enemy firing at " + target)
+
         self.counter += 1
         self.target_points.remove(target)
         if self.enemy_grid.points_dict[target].is_ship == True:
-            print("////////////HIT!////////////")
+            print( '\033[1;31m' + "////////////HIT!////////////" + '\033[0m')
             self.hit_point = target
             self.hit_list.append(target)
             self.enemy_grid.points_dict[target].hit()
@@ -573,31 +598,123 @@ class Player:
 
     
             
-        
+
+
+
+
+ 
+#Presets
+
+preset1 = Grid("Your Grid:")
+preset1_placements = [["D7", "H7"], ["G1", "G4"], ["B2", "B4"], ["C9", "E9"], ["J0", "J1"]]
+preset1.place_ship(Ship("Aircraft Carrier", "Player", 5), preset1_placements[0])
+preset1.place_ship(Ship("Battleship", "Player", 4), preset1_placements[1])
+preset1.place_ship(Ship("Destroyer", "Player", 3), preset1_placements[2])
+preset1.place_ship(Ship("Submarine", "Player", 3), preset1_placements[3])
+preset1.place_ship(Ship("Patrol Boat", "Player", 2), preset1_placements[4])
+
+
+preset2 = Grid("Your Grid:")
+preset2_placements = [["I3", "I7"], ["A5", "A8"], ["F7", "F9"], ["B0", "D0"], ["C2", "C3"]]
+preset2.place_ship(Ship("Aircraft Carrier", "Player", 5), preset2_placements[0])
+preset2.place_ship(Ship("Battleship", "Player", 4), preset2_placements[1])
+preset2.place_ship(Ship("Destroyer", "Player", 3), preset2_placements[2])
+preset2.place_ship(Ship("Submarine", "Player", 3), preset2_placements[3])
+preset2.place_ship(Ship("Patrol Boat", "Player", 2), preset2_placements[4])
+
+
+
+all_preset_placements = [preset1_placements, preset2_placements]
+
+
+
+
 #Player Setup
+
+print('''
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+         BBBBBBBBBBB             AAA     TTTTTTTTTTTTTTT TTTTTTTTTTTTTTT  LLL           EEEEEEEEEEE      SSSSSSSS      HHH       HHH   IIIIIIIIIII   PPPPPPPPPP            
+         BBB       BBB          AAAAA          TTT             TTT        LLL           EEE            SSS      SSS    HHH       HHH       III       PPP      PPP          
+         BBB        BBB        AAA AAA         TTT             TTT        LLL           EEE            SSS             HHH       HHH       III       PPP       PPP         
+         BBB       BBB        AAA   AAA        TTT             TTT        LLL           EEE             SSS            HHH       HHH       III       PPP      PPP
+         BBBBBBBBBBB         AAA     AAA       TTT             TTT        LLL           EEEEEEEEEEE        SSSSS       HHHHHHHHHHHHH       III       PPPPPPPPPP
+         BBB       BBB       AAAAAAAAAAA       TTT             TTT        LLL           EEE                     SSS    HHH       HHH       III       PPP
+         BBB        BBB     AAA       AAA      TTT             TTT        LLL           EEE                      SSS   HHH       HHH       III       PPP
+         BBB       BBB     AAA         AAA     TTT             TTT        LLL           EEE            SSS      SSS    HHH       HHH       III       PPP
+         BBBBBBBBBBB      AAA           AAA    TTT             TTT        LLLLLLLLLLLL  EEEEEEEEEEEE     SSSSSSSS      HHH       HHH   IIIIIIIIIII   PPP
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////         
+''')
+time.sleep(3)
+print("Welcome to Python Battleship!")
+print("If you would like to read the manual, please type \'Help\'\n")
+player_input = input("Press any key to continue...\n")
+if player_input.title() == "Help":
+    print('''\n
+    To win the game, you must find and sink all 5 enemy ships before the computer finds and sinks all 5 of yours.
+    On your turn, you simply need to choose a point on the grid to fire at. If there is a ship there, it will register as a \'Hit\'.
+    Otherwise, it will register as a \'Miss\'.
+    Try to arrange your ships in a pattern that will make it difficult for the computer to find them.
+    
+    Have fun!\n''')
+    input("Press any key to continue...\n")
 
 grid1 = Grid("Your Grid:")
 
 player_one_name = input("Please enter player name: ")
 
-grid1.place_ship(Ship("Destroyer", "Player", 3))
-grid1.place_ship(Ship("Carrier", "Player", 5))
-grid1.place_ship(Ship("Submarine", "Player", 3))
-grid1.place_ship(Ship("Patrol Boat", "Player", 2))
-grid1.place_ship(Ship("Battleship", "Player", 4))
+choice = input("\n" + player_one_name + ", would you like to manually place your ships, choose from 10 preset options, or have them placed randomly? Please type \'Manual\', \'Preset\', or \'Random\'\n")
+
+if choice.title() == "Manual":
+    grid1.print_grid()
+    grid1.place_ship(Ship("Aircraft Carrier", "Player", 5), "Manual")
+    grid1.print_grid()
+    grid1.place_ship(Ship("Battleship", "Player", 4), "Manual")
+    grid1.print_grid()
+    grid1.place_ship(Ship("Destroyer", "Player", 3), "Manual")
+    grid1.print_grid()
+    grid1.place_ship(Ship("Submarine", "Player", 3), "Manual")
+    grid1.print_grid()
+    grid1.place_ship(Ship("Patrol Boat", "Player", 2), "Manual")
+    
+    
+
+if choice.title() == "Random":
+    grid1.place_ship(Ship("Aircraft Carrier", "Player", 5), "Random")
+    grid1.place_ship(Ship("Battleship", "Player", 4), "Random")
+    grid1.place_ship(Ship("Destroyer", "Player", 3), "Random")
+    grid1.place_ship(Ship("Submarine", "Player", 3), "Random")
+    grid1.place_ship(Ship("Patrol Boat", "Player", 2), "Random")
+    
+
+if choice.title() == "Preset":
+    print("Here are some preset ship layout options. To select one, just type its number.")
+    print("\n   ///Preset (1)///")
+    preset1.print_grid()
+    print("\n   ///Preset (2)///")
+    preset2.print_grid()
+    player_preset_choice = input("\nWhich preset would you like to use?\n")
+    chosen_preset_placements = all_preset_placements[int(player_preset_choice) - 1]
+    
+    grid1.place_ship(Ship("Aircraft Carrier", "Player", 5), chosen_preset_placements[0])
+    grid1.place_ship(Ship("Battleship", "Player", 4), chosen_preset_placements[1])
+    grid1.place_ship(Ship("Destroyer", "Player", 3), chosen_preset_placements[2])
+    grid1.place_ship(Ship("Submarine", "Player", 3), chosen_preset_placements[3])
+    grid1.place_ship(Ship("Patrol Boat", "Player", 2), chosen_preset_placements[4])
+    
 
 
+    
 
-
-
+#Enemy Grid
 grid2 = Grid("Enemy Grid:")
 
-grid2.place_ship(Ship("Destroyer", "Enemy", 3))
-grid2.place_ship(Ship("Carrier", "Enemy", 5))
-grid2.place_ship(Ship("Submarine", "Enemy", 3))
-grid2.place_ship(Ship("Patrol Boat", "Enemy", 2))
-grid2.place_ship(Ship("Battleship", "Enemy", 4))
-
+grid2.place_ship(Ship("Aircraft Carrier", "Enemy", 5), "Random")
+grid2.place_ship(Ship("Battleship", "Enemy", 4), "Random")
+grid2.place_ship(Ship("Destroyer", "Enemy", 3), "Random")
+grid2.place_ship(Ship("Submarine", "Enemy", 3), "Random")
+grid2.place_ship(Ship("Patrol Boat", "Enemy", 2), "Random")
 
 
 
@@ -608,8 +725,16 @@ Player2 = Player("Enemy", "Computer", grid2, grid1)
 
 grid1.print_grid()
 
-#input("Ready? ")
+player_difficulty_selection = input("\nWhat difficulty AI would you like to play against? Please type either \'Easy\', \'Medium\', or \'Hard\'\n")
+if player_difficulty_selection.title() == "Easy":
+    ai_difficulty = 1
+if player_difficulty_selection.title() == "Medium":
+    ai_difficulty = 2
+if player_difficulty_selection.title() == "Hard":
+    ai_difficulty = 3
 
+print("\n" + player_difficulty_selection.title() + " AI selected.\n")
+print("Get ready!\n")
 
 '''while grid2.total_health > 0 and grid1.total_health > 0:
     grid2.print_grid()
@@ -617,10 +742,17 @@ grid1.print_grid()
     time.sleep(2)
     grid1.print_grid()
     time.sleep(2)
-    Player2.fire(Player2.ai(3))
+    Player2.fire(Player2.ai(ai_difficulty))
     time.sleep(2)'''
 
+while grid1.total_health > 0:
+    Player2.fire(Player2.ai(3))
+
+if grid1.total_health > 0:
+    print("You won! Congratulations!")
+if grid2.total_health > 0:
+    print("You Lost! Sorry!")
+else:
+    print("Tie!")
 
 
-while grid2.total_health > 0:
-    Player1.fire(Player1.ai(3))
