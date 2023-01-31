@@ -167,14 +167,25 @@ class Grid:
 
         if condition == "Manual":
             player_choice = input("Where would you like to place your " + ship.name + "?\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place it.\n")
-            player_choice_a = player_choice[:2]
-            player_choice_b = player_choice[-2:]
-            point_a = self.points_dict[player_choice_a]
-            point_b = self.points_dict[player_choice_b]
-            player_chosen_position = point_a.slicer(point_b)
-            for position in available_ship_positions:
-                if player_chosen_position == position:
-                    ship.position = position
+            for i in range(1, 78):
+                try:
+                    player_choice_a = player_choice[:2]
+                    player_choice_b = player_choice[-2:]
+                    point_a = self.points_dict[player_choice_a]
+                    point_b = self.points_dict[player_choice_b]
+                    player_chosen_position = point_a.slicer(point_b)
+                    
+                    for position in available_ship_positions:
+                        if player_chosen_position == position:
+                            ship.position = position
+                            break
+                        else:
+                            continue
+                except:
+                    player_choice = input("\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place your ship.\n")
+                    continue
+            
+                    
         
         if condition == "Random":
             ship.position = random.choice(available_ship_positions)
@@ -528,11 +539,12 @@ class Player:
             elif len(probable_firing_solution_points) > 0:
                 target = random.choice(probable_firing_solution_points)
 
-            elif len(probable_target_points) > 0:
-                target = random.choice(probable_target_points)
+                '''elif len(probable_target_points) > 0:
+                print("Probable points")
+                target = random.choice(probable_target_points)'''
 
             elif len(firing_solution_z2_clean) > 0:
-                target = random.choice(self.firing_solution_z2)
+                target = random.choice(firing_solution_z2_clean)
             
             else:
                 target = random.choice(self.target_points)
@@ -624,7 +636,7 @@ preset2.place_ship(Ship("Patrol Boat", "Player", 2), preset2_placements[4])
 
 
 
-all_preset_placements = [preset1_placements, preset2_placements]
+all_preset_placements = [[], preset1_placements, preset2_placements]
 
 
 
@@ -642,7 +654,7 @@ print('''
          BBB       BBB       AAAAAAAAAAA       TTT             TTT        LLL           EEE                     SSS    HHH       HHH       III       PPP
          BBB        BBB     AAA       AAA      TTT             TTT        LLL           EEE                      SSS   HHH       HHH       III       PPP
          BBB       BBB     AAA         AAA     TTT             TTT        LLL           EEE            SSS      SSS    HHH       HHH       III       PPP
-         BBBBBBBBBBB      AAA           AAA    TTT             TTT        LLLLLLLLLLLL  EEEEEEEEEEEE     SSSSSSSS      HHH       HHH   IIIIIIIIIII   PPP
+         BBBBBBBBBBB      AAA           AAA    TTT             TTT        LLLLLLLLLLLL  EEEEEEEEEEE      SSSSSSSS      HHH       HHH   IIIIIIIIIII   PPP
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////         
 ''')
@@ -666,18 +678,31 @@ player_one_name = input("Please enter player name: ")
 
 choice = input("\n" + player_one_name + ", would you like to manually place your ships, choose from 10 preset options, or have them placed randomly? Please type \'Manual\', \'Preset\', or \'Random\'\n")
 
+
+if choice.title() != "Manual" and choice.title() != "Preset" and choice.title() != "Random":
+    while choice.title() != "Manual" and choice.title() != "Preset" and choice.title() != "Random":
+        choice = input("Please type \'Manual\', \'Preset\', or \'Random\'\n")
+        if choice.title() == "Manual" or choice.title() == "Preset" or choice.title() == "Random":
+            break
+
+
+
 if choice.title() == "Manual":
+    print("\n")
     grid1.print_grid()
     grid1.place_ship(Ship("Aircraft Carrier", "Player", 5), "Manual")
+    print("\n")
     grid1.print_grid()
     grid1.place_ship(Ship("Battleship", "Player", 4), "Manual")
+    print("\n")
     grid1.print_grid()
     grid1.place_ship(Ship("Destroyer", "Player", 3), "Manual")
+    print("\n")
     grid1.print_grid()
     grid1.place_ship(Ship("Submarine", "Player", 3), "Manual")
+    print("\n")
     grid1.print_grid()
-    grid1.place_ship(Ship("Patrol Boat", "Player", 2), "Manual")
-    
+    grid1.place_ship(Ship("Patrol Boat", "Player", 2), "Manual") 
     
 
 if choice.title() == "Random":
@@ -694,8 +719,27 @@ if choice.title() == "Preset":
     preset1.print_grid()
     print("\n   ///Preset (2)///")
     preset2.print_grid()
+    
     player_preset_choice = input("\nWhich preset would you like to use?\n")
-    chosen_preset_placements = all_preset_placements[int(player_preset_choice) - 1]
+
+    for i in range(1, 78):
+        try:
+            player_preset_choice_number = int(player_preset_choice)
+            if int(player_preset_choice) <= 0 or int(player_preset_choice) > (len(all_preset_placements) - 1):
+                while int(player_preset_choice) <= 0 or int(player_preset_choice) > (len(all_preset_placements) - 1):
+                    player_preset_choice = input("Please type the number of the preset you would like to use.\n")
+                    continue
+            break
+        except:
+            player_preset_choice = input("Please type the number of the preset you would like to use.\n")
+            continue
+
+
+    
+
+    chosen_preset_placements = all_preset_placements[player_preset_choice_number]
+
+    print("\nPreset " + str(player_preset_choice_number) + " selected.\n")
     
     grid1.place_ship(Ship("Aircraft Carrier", "Player", 5), chosen_preset_placements[0])
     grid1.place_ship(Ship("Battleship", "Player", 4), chosen_preset_placements[1])
@@ -703,7 +747,6 @@ if choice.title() == "Preset":
     grid1.place_ship(Ship("Submarine", "Player", 3), chosen_preset_placements[3])
     grid1.place_ship(Ship("Patrol Boat", "Player", 2), chosen_preset_placements[4])
     
-
 
     
 
@@ -725,7 +768,14 @@ Player2 = Player("Enemy", "Computer", grid2, grid1)
 
 grid1.print_grid()
 
-player_difficulty_selection = input("\nWhat difficulty AI would you like to play against? Please type either \'Easy\', \'Medium\', or \'Hard\'\n")
+player_difficulty_selection = input("\nWhat difficulty AI would you like to play against? Please type \'Easy\', \'Medium\', or \'Hard\'\n")
+
+if player_difficulty_selection.title() != "Easy" and player_difficulty_selection.title() != "Medium" and player_difficulty_selection.title() != "Hard":
+    while player_difficulty_selection.title() != "Easy" and player_difficulty_selection.title() != "Medium" and player_difficulty_selection.title() != "Hard":
+        player_difficulty_selection = input("Please type \'Easy\', \'Medium\', or \'Hard\'\n")
+        if player_difficulty_selection.title() == "Easy" or player_difficulty_selection.title() == "Medium" or player_difficulty_selection.title() == "Hard":
+            break
+
 if player_difficulty_selection.title() == "Easy":
     ai_difficulty = 1
 if player_difficulty_selection.title() == "Medium":
@@ -745,8 +795,10 @@ print("Get ready!\n")
     Player2.fire(Player2.ai(ai_difficulty))
     time.sleep(2)'''
 
+
 while grid1.total_health > 0:
     Player2.fire(Player2.ai(3))
+
 
 if grid1.total_health > 0:
     print("You won! Congratulations!")
