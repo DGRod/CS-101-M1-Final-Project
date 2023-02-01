@@ -163,27 +163,31 @@ class Grid:
         for position in ship.all_positions:
             if position in self.all_positions_on_grid:
                 available_ship_positions.append(position)
+
+        taken_points = []
+        bad_positions = []
         
 
         if condition == "Manual":
-            player_choice = input("Where would you like to place your " + ship.name + "?\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place it.\n")
+            player_choice = input("\nWhere would you like to place your " + ship.name + "?\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place it.\n")
             for i in range(1, 78):
                 try:
-                    player_choice_a = player_choice[:2]
+                    '''player_choice_a = player_choice[:2]
                     player_choice_b = player_choice[-2:]
                     point_a = self.points_dict[player_choice_a]
                     point_b = self.points_dict[player_choice_b]
-                    player_chosen_position = point_a.slicer(point_b)
+                    player_chosen_position = point_a.slicer(point_b)'''
                     
-                    for position in available_ship_positions:
-                        if player_chosen_position == position:
-                            ship.position = position
-                            break
-                        else:
+                    if len(self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]])) != ship.length or self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]]) in self.all_positions_on_grid == False:
+                        while len(self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]])) != ship.length or self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]]) in self.all_positions_on_grid == False:
+                            player_choice = input("\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place your ship.\n")
                             continue
+                    ship.position = self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]])
+                    break
                 except:
                     player_choice = input("\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place your ship.\n")
                     continue
+
             
                     
         
@@ -199,8 +203,7 @@ class Grid:
         
 
 
-        taken_points = []
-        bad_positions = []
+        
 
         for point in ship.position:
             if ship.team == "Player":
@@ -218,10 +221,11 @@ class Grid:
             if bad_positions.count(position) > 1:
                 while bad_positions.count(position) > 1:
                     bad_positions.remove(position)
-
+        
         for position in bad_positions:
             if position in self.all_positions_on_grid:
                 self.all_positions_on_grid.remove(position)
+
 
         self.all_ships.append(ship)
         self.total_health += ship.health
@@ -688,7 +692,6 @@ if choice.title() != "Manual" and choice.title() != "Preset" and choice.title() 
 
 
 if choice.title() == "Manual":
-    print("\n")
     grid1.print_grid()
     grid1.place_ship(Ship("Aircraft Carrier", "Player", 5), "Manual")
     print("\n")
