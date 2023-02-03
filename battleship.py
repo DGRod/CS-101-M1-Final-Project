@@ -267,7 +267,6 @@ class Player:
         self.hit_list = []
         self.most_probable_points = []
         self.counter = 1
-        self.enemy_fleet = self.enemy_grid.all_ships
 
         numbers = [str(x) for x in range(0, 10)]
         abc = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
@@ -367,19 +366,33 @@ class Player:
 
     def ai(self, difficulty=1):
 
-        
-
-
-
-
-
+     
         firing_solution_z2_clean = []
         for point in self.firing_solution_z2:     
             if point in self.target_points:
                 firing_solution_z2_clean.append(point)
 
         #print("Firing solution: ", firing_solution_z2_clean)
-        
+
+
+        clean_center_points = []
+        for point in self.enemy_grid.center_points:
+            if point in self.target_points:
+                clean_center_points.append(point)
+
+
+        more_than_one_away = []
+        for point in self.target_points:
+            nearest_points = self.search(point)
+            left_space = nearest_points[0].slicer(self.enemy_grid.points_dict[point])
+            right_space = self.enemy_grid.points_dict[point].slicer(nearest_points[1])
+            up_space = nearest_points[2].slicer(self.enemy_grid.points_dict[point])
+            down_space = self.enemy_grid.points_dict[point].slicer(nearest_points[3])
+            #print(point, left_space, right_space, up_space, down_space)
+            if len(left_space) >= 2 and len(right_space) >= 2 and len(up_space) >= 2 and len(down_space) >= 2:
+                more_than_one_away.append(point)
+        #print(more_than_one_away)
+
 
 
         #=================================================================================================================================
@@ -528,9 +541,63 @@ class Player:
         for point in clean_likely_points:
             if point in probable_target_points:
                 probable_and_likely_points.append(point)
+
+        center_firing_solution = []
+        for point in clean_center_points:
+            if point in more_than_one_away:
+                center_firing_solution.append(point)
+
+        probable_center_firing_solution = []
+        for point in center_firing_solution:
+            if point in probable_points:
+                probable_center_firing_solution.append(point)
+
+        probable_more_than_one_away = []
+        for point in more_than_one_away:
+            if point in probable_points:
+                probable_more_than_one_away.append(point)
+
+
+
+        if difficulty >= 4:
+
+            if self.counter == 1:
+                priority_4 = clean_center_points
+            
+            if self.counter > 1 and self.counter <= 8:
+                priority_4 = probable_center_firing_solution
+
+            if self.counter > 8:
+                priority_4 = probable_more_than_one_away
+
+            #if self.enemy_grid.all_ships[-1].health == 0:
+
+
+
+
+            if len(probable_and_likely_points) > 0:
+                target = random.choice(probable_and_likely_points)
+            
+            elif len(clean_likely_points) > 0:
+                target = random.choice(clean_likely_points)
+            
+            elif len(clean_hit_neighbors) > 0:
+                target = random.choice(clean_hit_neighbors)
+
+            elif len(priority_4) > 0:
+                target = random.choice(priority_4)
+
+            elif len(more_than_one_away) > 0:
+                target = random.choice(more_than_one_away)
+
+            elif len(firing_solution_z2_clean) > 0:
+                target = random.choice(firing_solution_z2_clean)
+            
+            else:
+                target = random.choice(self.target_points)
         
 
-        if difficulty >= 3:
+        elif difficulty >= 3:
 
             if len(probable_and_likely_points) > 0:
                 target = random.choice(probable_and_likely_points)
@@ -606,6 +673,8 @@ class Player:
                     self.enemy_grid.total_health += -1
                     if ship.health == 0:
                         ship.sink()
+                        if ai_difficulty == 4:
+                            self.hit_point = "  "
             
             self.enemy_grid.print_grid()
         else:
@@ -792,7 +861,7 @@ if player_difficulty_selection.title() == "Extra Hard":
 print("\n" + player_difficulty_selection.title() + " AI selected.\n")
 print("Get ready!\n")
 
-while grid2.total_health > 0 and grid1.total_health > 0:
+'''while grid2.total_health > 0 and grid1.total_health > 0:
     grid2.print_grid()
     player_target = (input("Where would you like to fire? ")).upper()
     for i in range(1, 78):
@@ -810,11 +879,11 @@ while grid2.total_health > 0 and grid1.total_health > 0:
     grid1.print_grid()
     time.sleep(2)
     Player2.fire(Player2.ai(ai_difficulty))
-    time.sleep(2)
+    time.sleep(2)'''
 
 
-'''while grid1.total_health > 0:
-    Player2.fire(Player2.ai(3))'''
+while grid1.total_health > 0:
+    Player2.fire(Player2.ai(4))
 
 
 if grid1.total_health > 0:
