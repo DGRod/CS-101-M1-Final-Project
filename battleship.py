@@ -115,6 +115,10 @@ class Grid:
         self.name = name
         self.all_ships = []
         self.total_health = 0
+        self.center_points = ["D3", "D4", "D5", "D6", "E3", "E4", "E5", "E6", "F3", "F4", "F5", "F6", "G3", "G4", "G5", "G6"]
+
+        self.taken_points = []
+        self.bad_positions = []
         
 
     #Defining the Points:
@@ -164,22 +168,13 @@ class Grid:
             if position in self.all_positions_on_grid:
                 available_ship_positions.append(position)
 
-        taken_points = []
-        bad_positions = []
-        
 
         if condition == "Manual":
-            player_choice = input("\nWhere would you like to place your " + ship.name + "?\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place it.\n")
+            player_choice = (input("\nWhere would you like to place your " + ship.name + "?\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place it.\n")).upper()
             for i in range(1, 78):
                 try:
-                    '''player_choice_a = player_choice[:2]
-                    player_choice_b = player_choice[-2:]
-                    point_a = self.points_dict[player_choice_a]
-                    point_b = self.points_dict[player_choice_b]
-                    player_chosen_position = point_a.slicer(point_b)'''
-                    
-                    if len(self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]])) != ship.length or self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]]) in self.all_positions_on_grid == False:
-                        while len(self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]])) != ship.length or self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]]) in self.all_positions_on_grid == False:
+                    if len(self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]])) != ship.length or self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]]) in self.bad_positions:
+                        while len(self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]])) != ship.length or self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]]) in self.bad_positions:
                             player_choice = input("\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place your ship.\n")
                             continue
                     ship.position = self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]])
@@ -187,13 +182,12 @@ class Grid:
                 except:
                     player_choice = input("\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place your ship.\n")
                     continue
-
-            
-                    
+   
         
         if condition == "Random":
             ship.position = random.choice(available_ship_positions)
         
+
         if type(condition) == list:
             point_a = self.points_dict[condition[0]]
             point_b = self.points_dict[condition[-1]]
@@ -210,19 +204,19 @@ class Grid:
                 self.points_dict[point].make_ship(ship.name[0])
             if ship.team == "Enemy":
                 self.points_dict[point].make_ship("-")
-            taken_points.append(point)
+            self.taken_points.append(point)
 
-        for point in taken_points:
+        for point in self.taken_points:
             for position in self.all_positions_on_grid:
                 if point in position:
-                    bad_positions.append(position)
+                    self.bad_positions.append(position)
         
-        for position in bad_positions:
-            if bad_positions.count(position) > 1:
-                while bad_positions.count(position) > 1:
-                    bad_positions.remove(position)
+        for position in self.bad_positions:
+            if self.bad_positions.count(position) > 1:
+                while self.bad_positions.count(position) > 1:
+                    self.bad_positions.remove(position)
         
-        for position in bad_positions:
+        for position in self.bad_positions:
             if position in self.all_positions_on_grid:
                 self.all_positions_on_grid.remove(position)
 
@@ -273,6 +267,7 @@ class Player:
         self.hit_list = []
         self.most_probable_points = []
         self.counter = 1
+        self.enemy_fleet = self.enemy_grid.all_ships
 
         numbers = [str(x) for x in range(0, 10)]
         abc = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
@@ -371,6 +366,12 @@ class Player:
         
 
     def ai(self, difficulty=1):
+
+        
+
+
+
+
 
         firing_solution_z2_clean = []
         for point in self.firing_solution_z2:     
@@ -650,15 +651,15 @@ all_preset_placements = [[], preset1_placements, preset2_placements]
 print('''
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-         BBBBBBBBBBB             AAA     TTTTTTTTTTTTTTT TTTTTTTTTTTTTTT  LLL           EEEEEEEEEEE      SSSSSSSS      HHH       HHH   IIIIIIIIIII   PPPPPPPPPP            
-         BBB       BBB          AAAAA          TTT             TTT        LLL           EEE            SSS      SSS    HHH       HHH       III       PPP      PPP          
-         BBB        BBB        AAA AAA         TTT             TTT        LLL           EEE            SSS             HHH       HHH       III       PPP       PPP         
-         BBB       BBB        AAA   AAA        TTT             TTT        LLL           EEE             SSS            HHH       HHH       III       PPP      PPP
+             BBBBBBBBBBB             AAA     TTTTTTTTTTTTTTT TTTTTTTTTTTTTTT  LLL           EEEEEEEEEEE      SSSSSSSS      HHH       HHH   IIIIIIIIIII   PPPPPPPPPP            
+            BBB       BBB          AAAAA          TTT             TTT        LLL           EEE            SSS      SSS    HHH       HHH       III       PPP      PPP          
+           BBB        BBB        AAA AAA         TTT             TTT        LLL           EEE            SSS             HHH       HHH       III       PPP       PPP         
+          BBB       BBB        AAA   AAA        TTT             TTT        LLL           EEE             SSS            HHH       HHH       III       PPP      PPP
          BBBBBBBBBBB         AAA     AAA       TTT             TTT        LLL           EEEEEEEEEEE        SSSSS       HHHHHHHHHHHHH       III       PPPPPPPPPP
-         BBB       BBB       AAAAAAAAAAA       TTT             TTT        LLL           EEE                     SSS    HHH       HHH       III       PPP
-         BBB        BBB     AAA       AAA      TTT             TTT        LLL           EEE                      SSS   HHH       HHH       III       PPP
-         BBB       BBB     AAA         AAA     TTT             TTT        LLL           EEE            SSS      SSS    HHH       HHH       III       PPP
-         BBBBBBBBBBB      AAA           AAA    TTT             TTT        LLLLLLLLLLLL  EEEEEEEEEEE      SSSSSSSS      HHH       HHH   IIIIIIIIIII   PPP
+        BBB       BBB       AAAAAAAAAAA       TTT             TTT        LLL           EEE                     SSS    HHH       HHH       III       PPP
+       BBB        BBB     AAA       AAA      TTT             TTT        LLL           EEE                      SSS   HHH       HHH       III       PPP
+      BBB       BBB     AAA         AAA     TTT             TTT        LLL           EEE            SSS      SSS    HHH       HHH       III       PPP
+     BBBBBBBBBBB      AAA           AAA    TTT             TTT        LLLLLLLLLLLL  EEEEEEEEEEEE     SSSSSSSS      HHH       HHH   IIIIIIIIIII   PPP
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////         
 ''')
@@ -771,12 +772,12 @@ Player2 = Player("Enemy", "Computer", grid2, grid1)
 
 grid1.print_grid()
 
-player_difficulty_selection = input("\nWhat difficulty AI would you like to play against? Please type \'Easy\', \'Medium\', or \'Hard\'\n")
+player_difficulty_selection = input("\nWhat difficulty AI would you like to play against? Please type \'Easy\', \'Medium\', \'Hard\', or \'Extra Hard\'\n")
 
-if player_difficulty_selection.title() != "Easy" and player_difficulty_selection.title() != "Medium" and player_difficulty_selection.title() != "Hard":
-    while player_difficulty_selection.title() != "Easy" and player_difficulty_selection.title() != "Medium" and player_difficulty_selection.title() != "Hard":
-        player_difficulty_selection = input("Please type \'Easy\', \'Medium\', or \'Hard\'\n")
-        if player_difficulty_selection.title() == "Easy" or player_difficulty_selection.title() == "Medium" or player_difficulty_selection.title() == "Hard":
+if player_difficulty_selection.title() != "Easy" and player_difficulty_selection.title() != "Medium" and player_difficulty_selection.title() != "Hard" and player_difficulty_selection.title() != "Extra Hard":
+    while player_difficulty_selection.title() != "Easy" and player_difficulty_selection.title() != "Medium" and player_difficulty_selection.title() != "Hard" and player_difficulty_selection.title() != "Extra Hard":
+        player_difficulty_selection = input("Please type \'Easy\', \'Medium\', \'Hard\', or \'Extra Hard\'\n")
+        if player_difficulty_selection.title() == "Easy" or player_difficulty_selection.title() == "Medium" or player_difficulty_selection.title() == "Hard" or player_difficulty_selection.title() == "Extra Hard":
             break
 
 if player_difficulty_selection.title() == "Easy":
@@ -785,6 +786,8 @@ if player_difficulty_selection.title() == "Medium":
     ai_difficulty = 2
 if player_difficulty_selection.title() == "Hard":
     ai_difficulty = 3
+if player_difficulty_selection.title() == "Extra Hard":
+    ai_difficulty = 4
 
 print("\n" + player_difficulty_selection.title() + " AI selected.\n")
 print("Get ready!\n")
