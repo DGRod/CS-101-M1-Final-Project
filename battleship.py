@@ -170,17 +170,18 @@ class Grid:
 
 
         if condition == "Manual":
-            player_choice = (input("\nWhere would you like to place your " + ship.name + "?\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place it.\n")).upper()
+            player_choice = (input("\nWhere would you like to place your " + ship.name + "? (Length: " + str(ship.length) + ")\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place it.\n    (For example, type \'A0, A" + str((ship.length)-1) + "\' to place your " + ship.name + " on the points between A0 and A" + str((ship.length)-1) + ".)\n")).upper()
             for i in range(1, 78):
                 try:
-                    if len(self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]])) != ship.length or self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]]) in self.bad_positions:
-                        while len(self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]])) != ship.length or self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]]) in self.bad_positions:
-                            player_choice = input("\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place your ship.\n")
+                    if len((self.points_dict[((sorted((player_choice.replace(" ", "")).split(",")))[0])]).slicer(self.points_dict[((sorted((player_choice.replace(" ", "")).split(",")))[-1])])) != ship.length or (self.points_dict[((sorted((player_choice.replace(" ", "")).split(",")))[0])]).slicer(self.points_dict[((sorted((player_choice.replace(" ", "")).split(",")))[-1])]) in self.bad_positions:
+                        while len((self.points_dict[((sorted((player_choice.replace(" ", "")).split(",")))[0])]).slicer(self.points_dict[((sorted((player_choice.replace(" ", "")).split(",")))[-1])])) != ship.length or (self.points_dict[((sorted((player_choice.replace(" ", "")).split(",")))[0])]).slicer(self.points_dict[((sorted((player_choice.replace(" ", "")).split(",")))[-1])]) in self.bad_positions:
+                            player_choice = (input("\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place your " + ship.name + ".\n    (For example, type \'A0, A" + str((ship.length)-1) + "\' to place your " + ship.name + " on the points between A0 and A" + str((ship.length)-1) + ".)\n")).upper()
                             continue
-                    ship.position = self.points_dict[player_choice[:2]].slicer(self.points_dict[player_choice[-2:]])
+                    ship.position = (self.points_dict[((sorted((player_choice.replace(" ", "")).split(",")))[0])]).slicer(self.points_dict[((sorted((player_choice.replace(" ", "")).split(",")))[-1])])
+                    print(ship.position)
                     break
                 except:
-                    player_choice = input("\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place your ship.\n")
+                    player_choice = (input("\nPlease type the first and last coordinates (separated by a comma) of the position where you would like to place your " + ship.name + ".\n    (For example, type \'A0, A" + str((ship.length)-1) + "\' to place your " + ship.name + " on the points between A0 and A" + str((ship.length)-1) + ".)\n")).upper()
                     continue
    
         
