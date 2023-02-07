@@ -710,8 +710,35 @@ preset2.place_ship(Ship("Submarine", "Player", 3), preset2_placements[3])
 preset2.place_ship(Ship("Patrol Boat", "Player", 2), preset2_placements[4])
 
 
+preset3 = Grid("Your Grid:")
+preset3_placements = [["F0", "F4"], ["B5", "B8"], ["H1", "H3"], ["E9", "G9"], ["A2", "B2"]]
+preset3.place_ship(Ship("Aircraft Carrier", "Player", 5), preset3_placements[0])
+preset3.place_ship(Ship("Battleship", "Player", 4), preset3_placements[1])
+preset3.place_ship(Ship("Destroyer", "Player", 3), preset3_placements[2])
+preset3.place_ship(Ship("Submarine", "Player", 3), preset3_placements[3])
+preset3.place_ship(Ship("Patrol Boat", "Player", 2), preset3_placements[4])
 
-all_preset_placements = [[], preset1_placements, preset2_placements]
+
+preset4 = Grid("Your Grid:")
+preset4_placements = [["E8", "I8"], ["G6", "J6"], ["A5", "C5"], ["C1", "C3"], ["G1", "H1"]]
+preset4.place_ship(Ship("Aircraft Carrier", "Player", 5), preset4_placements[0])
+preset4.place_ship(Ship("Battleship", "Player", 4), preset4_placements[1])
+preset4.place_ship(Ship("Destroyer", "Player", 3), preset4_placements[2])
+preset4.place_ship(Ship("Submarine", "Player", 3), preset4_placements[3])
+preset4.place_ship(Ship("Patrol Boat", "Player", 2), preset4_placements[4])
+
+
+preset5 = Grid("Your Grid:")
+preset5_placements = [["J2", "J6"], ["I5", "I8"], ["C3", "C5"], ["A0", "A2"], ["C9", "D9"]]
+preset5.place_ship(Ship("Aircraft Carrier", "Player", 5), preset5_placements[0])
+preset5.place_ship(Ship("Battleship", "Player", 4), preset5_placements[1])
+preset5.place_ship(Ship("Destroyer", "Player", 3), preset5_placements[2])
+preset5.place_ship(Ship("Submarine", "Player", 3), preset5_placements[3])
+preset5.place_ship(Ship("Patrol Boat", "Player", 2), preset5_placements[4])
+
+
+
+all_preset_placements = [[], preset1_placements, preset2_placements, preset3_placements, preset4_placements, preset5_placements]
 
 
 
@@ -791,8 +818,18 @@ if choice.title() == "Preset":
     print("Here are some preset ship layout options. To select one, just type its number.")
     print("\n   ///Preset (1)///")
     preset1.print_grid()
+    time.sleep(2)
     print("\n   ///Preset (2)///")
     preset2.print_grid()
+    time.sleep(2)
+    print("\n   ///Preset (3)///")
+    preset3.print_grid()
+    time.sleep(2)
+    print("\n   ///Preset (4)///")
+    preset4.print_grid()
+    time.sleep(2)
+    print("\n   ///Preset (5)///")
+    preset5.print_grid()
     
     player_preset_choice = input("\nWhich preset would you like to use?\n")
 
