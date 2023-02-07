@@ -861,13 +861,15 @@ if player_difficulty_selection.title() == "Extra Hard":
 print("\n" + player_difficulty_selection.title() + " AI selected.\n")
 print("Get ready!\n")
 
-'''while grid2.total_health > 0 and grid1.total_health > 0:
+while grid2.total_health > 0 and grid1.total_health > 0:
     grid2.print_grid()
     player_target = (input("Where would you like to fire? ")).upper()
+    if player_target == "CLEAR" or player_target == "EXIT":
+        break
     for i in range(1, 78):
                 try:
-                    if player_target in grid2.taken_points or player_target not in Player1.target_points:
-                        while player_target in grid2.taken_points or player_target not in Player1.target_points:
+                    if player_target not in Player1.target_points:
+                        while player_target not in Player1.target_points:
                             player_target = (input("Where would you like to fire? ")).upper()
                             continue
                     break
@@ -879,11 +881,11 @@ print("Get ready!\n")
     grid1.print_grid()
     time.sleep(2)
     Player2.fire(Player2.ai(ai_difficulty))
-    time.sleep(2)'''
+    time.sleep(2)
 
 
-while grid1.total_health > 0:
-    Player2.fire(Player2.ai(4))
+'''while grid1.total_health > 0:
+    Player2.fire(Player2.ai(4))'''
 
 
 if grid1.total_health > 0:
