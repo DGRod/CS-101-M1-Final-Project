@@ -844,9 +844,11 @@ while grid2.total_health > 0 and grid1.total_health > 0:
     Player2.fire(Player2.ai(4))'''
 
 
-if grid1.total_health > 0:
+if grid1.total_health > 0 and grid2.total_health == 0:
     print("You won! Congratulations!")
-if grid2.total_health > 0:
+if grid2.total_health > 0 and grid1.total_health == 0:
     print("You Lost! Sorry!")
-else:
+if grid1.total_health == grid2.total_health and grid1.total_health == 0:
     print("Tie!")
+else:
+    print("Game ended.")
